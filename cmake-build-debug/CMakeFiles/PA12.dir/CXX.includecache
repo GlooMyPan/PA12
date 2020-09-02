@@ -1,0 +1,28 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+E:/ProjekAufgaben/PA12/Natuerlich.cpp
+Natuerlich.h
+E:/ProjekAufgaben/PA12/Natuerlich.h
+algorithm
+-
+
+E:/ProjekAufgaben/PA12/Natuerlich.h
+iostream
+-
+string
+-
+vector
+-
+
+E:/ProjekAufgaben/PA12/main.cpp
+string
+-
+Natuerlich.h
+E:/ProjekAufgaben/PA12/Natuerlich.h
+
