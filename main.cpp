@@ -23,10 +23,24 @@ Natuerlich fibonacci(size_t n) {
 
 
 // berechne Binomialkoeffizient "n 黚er k"
-Natuerlich binom(size_t n, size_t k) {
+/*Natuerlich binom(size_t n, size_t k) {
     if (k == 0 || k == n)
         return 1;
     return binom(n - 1, k) + binom(n - 1, k - 1);
+}*/
+
+/** mit Dynamic Programming **/
+Natuerlich binom(size_t n, size_t k) {
+    vector<vector<Natuerlich>> dp(n+1, vector<Natuerlich>(k+1, 0));
+    for (size_t i = 0; i <= n; ++i) {
+        for (size_t j = 0; j <= min(i, k); ++j) {
+            if (j == 0 || j == i)
+                dp[i][j] = 1;
+            else
+                dp[i][j] = dp[i-1][j] + dp[i-1][j-1];
+        }
+    }
+    return dp[n][k];
 }
 
 

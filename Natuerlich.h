@@ -12,10 +12,12 @@ using namespace std;
 class Natuerlich {
     friend ostream &operator<<(ostream & cout, Natuerlich& n);
 public:
+    /** Konstruktoren **/
     Natuerlich();
     Natuerlich(string const & str);
     Natuerlich(long long zahl);
 
+    /** Rechnen **/
     Natuerlich operator+(Natuerlich const& nat) const;
 
 private:
