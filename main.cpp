@@ -1,6 +1,6 @@
 #include <string>
 #include "Natuerlich.h"
-
+#include <vector>
 
 // berechne n. Fibonacci-Zahl
 Natuerlich fibonacci(size_t n) {

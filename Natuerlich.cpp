@@ -1,19 +1,20 @@
 //
-// Created by Xuantong Pan on 2020/9/2.
+// Created by Xuantong Pan on 2020/9/11.
 //
 
 #include "Natuerlich.h"
-#include <algorithm> // reverse()
 
-Natuerlich::Natuerlich() {
-    this->_value.push_back(0);
-}
-
-Natuerlich::Natuerlich(long long zahl) {
-    while (zahl) {
-        this->_value.push_back(zahl % 10);
-        zahl /= 10;
+Natuerlich::Natuerlich(string const & str)
+{
+    this->Resize(str.size());
+    string str2 = str.substr(str.find_first_not_of('0'));  // z.B 000111 -> 111
+    for (int i = str2.size() - 1; ~i; --i)
+    {
+        if (str2[i] >= '0' && str2[i] <= '9') // nur wenn c eine Zahl ist.
+            this->Push_back(str2[i] - '0');
     }
+    if (!this->getSize())
+        this->Push_back(0); // wenn str empty ist, denn _value ist [0]
 }
 
 /**
@@ -21,62 +22,172 @@ Natuerlich::Natuerlich(long long zahl) {
  * [6, 5, 4, 3, 2, 1]
  */
 
-Natuerlich::Natuerlich(string const & str) {
-    int i = str.find_first_not_of('0'); // z.B 000111 -> 111
-    for (; i < str.size(); ++i) {
-        char c = str[i];
-        if (c >= '0' && c <= '9')
-            this->_value.push_back(c - '0'); // nur wenn c eine Zahl ist.
-    }
-    if (this->_value.empty())
-        this->_value.push_back(0); // wenn str empty ist, denn _value ist [0]
 
-    reverse(this->_value.begin(), this->_value.end());
+Natuerlich::Natuerlich(long long zahl)
+{
+    this->Resize(5);
+    if (zahl == 0)
+        this->Push_back(0);
+
+    else
+        while (zahl != 0)
+        {
+            this->Push_back(zahl % 10);
+            zahl /= 10;
+        }
 }
 
-Natuerlich Natuerlich::operator+(const Natuerlich &nat) const {
-    int tSize = this->_value.size();
-    vector<int> v1 = nat._value;
-    vector<int> v2 = this->_value;
-    int nSize = v1.size(); // size() von nat._value
+Natuerlich::Natuerlich(const Natuerlich &nat)
+{
+    this->_capacity = nat._capacity;
+    this->_size = nat._size;
+
+    this->_value = new int[nat._capacity];
+
+    for (int i = 0; i < this->_size; ++i)
+        this->_value[i] = nat._value[i];
+
+}
+
+
+Natuerlich::Natuerlich(int laenge, int val)
+{
+    this->Resize(laenge);
+    this->_size = this->getCapacity();
+    for (int i = 0; i < this->_size; ++i)
+        this->_value[i] = val;
+}
+
+void Natuerlich::Push_back(int val)
+{
+    if (this->_value)
+    {
+        if (this->_size == this->_capacity)
+            this->Resize(this->_capacity + 2);
+        this->_value[this->_size++] = val;
+    }
+}
+
+void Natuerlich::Resize(int capacity)
+{
+    if (this->getCapacity() >= capacity)
+        return;
+    if (this->getSize() > 0)
+    {
+        int * temp = new int[capacity];
+        for (int i = 0; i < this->_size; ++i)
+            temp[i] = this->_value[i];
+
+        delete [] this->_value;
+        this->_value = temp;
+        this->_capacity = capacity;
+    }
+    else
+    {
+        this->_value = new int[capacity];
+        this->_capacity = capacity;
+        this->_size = 0;
+    }
+}
+
+int Natuerlich::getCapacity() const
+{
+    if (this->_capacity)
+        return this->_capacity; // nur wenn _capacity > 0 ist.
+    else
+        return 0;
+}
+
+int Natuerlich::getSize() const
+{
+    if (this->_size)
+        return this->_size; // nur wenn _size > 0 ist.
+    else
+        return 0;
+}
+
+
+Natuerlich Natuerlich::operator+(const Natuerlich &nat) const
+{
+    int tSize = this->getSize();
+    Natuerlich n1 = nat;
+    Natuerlich n2 = *this;
+    int nSize = n1.getSize();
     int maxSize = max(tSize, nSize);
-    tSize < nSize ? v2.resize(maxSize) : v1.resize(maxSize); // resize die beide Vectoren zum maxSize
-    vector<int> ans(maxSize + 1, 0); // die Summe von v1 und v2
-    for (int i = 0; i < maxSize; ++i) {
-        int _sum = v2[i] + v1[i];
-        if (ans[i] + _sum > 9) {
+    tSize < nSize ? n2.Resize(maxSize) : n1.Resize(maxSize);
+    Natuerlich ans(maxSize + 1, 0);
+    for (int i = 0; i < maxSize; ++i)
+    {
+        if (n2[i] < 0)
+            n2[i] = 0;
+
+        if (n1[i] < 0)
+            n1[i] = 0;
+        int _sum = n2[i] + n1[i];
+        if (ans[i] + _sum > 9)
+        {
             ans[i] += _sum - 10;
-            ++ans[i + 1];
+            ++ans[i+1];
+
             int m = 1;
-            while (ans[i + m] == 10) {
-                ans[i + m++] = 0;
-                ++ans[i + m];
+            while (ans[i+m] == 10)
+            {
+                ans[i+m++] = 0;
+                ++ans[i+m];
             }
         } else
             ans[i] += _sum;
     }
-    Natuerlich newClass;
-    newClass._value = ans;
-    return newClass;
+    return ans;
 }
 
-ostream &operator<<(ostream &cout, Natuerlich &n) {
-    if (n._value == vector<int>(1, 0))
+Natuerlich& Natuerlich::operator=(const Natuerlich &nat)
+{
+    if (this->_value)
+    {
+        delete [] this->_value;
+        this->_value = nullptr;
+        this->_capacity = 0;
+        this->_size = 0;
+    }
+
+    this->_capacity = nat._capacity;
+    this->_size = nat._size;
+    this->_value = new int[nat._capacity];
+    for (int i = 0; i < this->_size; ++i)
+        this->_value[i] = nat._value[i];
+
+    return *this; // damit a = b = c funktioniert
+}
+
+ostream &operator<<(ostream &cout, Natuerlich const &n)
+{
+    if (n.getSize() == 1 && n[0] == 0)
         cout << 0;
-    else {
-        int i = n._value.size() - 1;
-        for (int j = n._value.size()-1; j > 0; --j)
-            if (n._value[j] == 0)
+    else
+    {
+        int i = n.getSize() - 1;
+        for (int j = n.getSize() - 1; j > 0; --j)
+            if (n[j] == 0)
                 --i;
             else
                 break;
-        for (; ~i; --i)
-            cout << n._value[i];
-    }
 
+        for (; ~i; --i)
+            cout << n[i];
+    }
     return cout;
 }
 
-Natuerlich::Natuerlich(size_t laenge) {
-    this->_value.resize(laenge);
+
+
+Natuerlich::~Natuerlich()
+{
+    if (this->_value)
+    {
+        delete[] this->_value;
+        this->_value = nullptr;
+        this->_capacity = 0;
+        this->_size = 0;
+    }
 }
